@@ -1,0 +1,22 @@
+/* Estilos base */
+:root {
+    --primary-color: #3490dc;
+    --secondary-color: #38a169;
+    --text-color: #2d3748;
+    --background-color: #ffffff;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    line-height: 1.6;
+    color: var(--text-color);
+    background-color: var(--background-color);
+}
+
+/* Agrega tus estilos personalizados aquí */
