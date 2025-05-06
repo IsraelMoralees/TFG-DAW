@@ -1,22 +1,43 @@
-/* Estilos base */
 :root {
-    --primary-color: #3490dc;
-    --secondary-color: #38a169;
-    --text-color: #2d3748;
-    --background-color: #ffffff;
+    /* Color primario: Morado oscuro */
+    --bs-primary: #7100fb;
+    
+    /* Color secundario: Negro */
+    --bs-secondary: #212529;
 }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+/* Estilos para elementos primarios */
+.bg-primary {
+    background-color: var(--bs-primary) !important;
 }
 
-body {
-    font-family: 'Arial', sans-serif;
-    line-height: 1.6;
-    color: var(--text-color);
-    background-color: var(--background-color);
+.btn-primary {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
 }
 
-/* Agrega tus estilos personalizados aquí */
+.btn-primary:hover {
+    background-color: #3a1070;
+    border-color: #3a1070;
+}
+
+/* Efectos hover en las cards */
+.card {
+    transition: transform 0.3s ease;
+    background-color: white;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* Estilos para el navbar */
+.navbar-dark {
+    background-color: var(--bs-secondary) !important;
+}
+
+/* Enlaces */
+.nav-link:hover {
+    color: var(--bs-primary) !important;
+}
