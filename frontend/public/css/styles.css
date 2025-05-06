@@ -41,3 +41,17 @@
 .nav-link:hover {
     color: var(--bs-primary) !important;
 }
+
+.list-unstyled a:hover{
+    color: var(--bs-primary) !important;
+
+}
+
+/* Estilos para el título de productos destacados */
+    .featured-products h3 {
+        transition: transform 0.3s ease;
+    }
+
+.featured-products h3:hover {
+    transform: scale(1.2);
+}
