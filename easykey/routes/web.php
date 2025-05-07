@@ -3,6 +3,8 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\VideojuegoController;
+use App\Http\Controllers\Admin\VideojuegoController as AdminVideojuegoController;
+
 
 Route::get('/', function () {
     return view('welcome');
@@ -19,5 +21,12 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::get('/catalogo', [VideojuegoController::class, 'index'])->name('catalogo');
+
+Route::middleware(['auth','admin'])
+     ->prefix('admin')
+     ->name('admin.')
+     ->group(function(){
+         Route::resource('videojuegos', AdminVideojuegoController::class);
+});
 
 require __DIR__.'/auth.php';
