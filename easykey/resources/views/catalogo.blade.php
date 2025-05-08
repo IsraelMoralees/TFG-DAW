@@ -14,6 +14,11 @@
                     <p class="card-text">{{ $juego->descripcion }}</p>
                     <p><strong>Plataforma:</strong> {{ $juego->plataforma }}</p>
                     <p><strong>Precio:</strong> €{{ $juego->precio }}</p>
+
+                    <!-- Aquí el botón -->
+                    <a href="{{ route('catalogo.show', $juego) }}" class="btn btn-primary">
+                    Ver detalles
+                    </a>
                 </div>
             </div>
         </div>
