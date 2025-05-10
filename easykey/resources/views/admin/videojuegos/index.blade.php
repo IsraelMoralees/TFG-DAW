@@ -1,41 +1,39 @@
 @extends('layouts.app')
-
 @section('content')
-<div class="container">
-  <h1 class="mb-4">Listado de Videojuegos</h1>
-  <a href="{{ route('admin.videojuegos.create') }}" class="btn btn-primary mb-3">+ Nuevo Juego</a>
-
+<div class="container py-4">
+  <h1>Listado de Videojuegos</h1>
   @if(session('success'))
     <div class="alert alert-success">{{ session('success') }}</div>
   @endif
-
-  <table class="table table-striped">
-    <thead><tr>
-      <th>ID</th><th>Título</th><th>Plataforma</th><th>Precio</th><th>Creado</th><th>Acciones</th>
-    </tr></thead>
-    <tbody>
-      @forelse($videojuegos as $j)
-      <tr>
-        <td>{{ $j->id }}</td>
-        <td>{{ $j->titulo }}</td>
-        <td>{{ $j->plataforma }}</td>
-        <td>€{{ number_format($j->precio,2) }}</td>
-        <td>{{ $j->created_at->format('d/m/Y') }}</td>
-        <td>
-          <a href="{{ route('admin.videojuegos.show', $j) }}" class="btn btn-info btn-sm">Ver</a>
-          <a href="{{ route('admin.videojuegos.edit', $j) }}" class="btn btn-warning btn-sm">Editar</a>
-          <form action="{{ route('admin.videojuegos.destroy', $j) }}" method="POST" class="d-inline">
-            @csrf @method('DELETE')
-            <button class="btn btn-danger btn-sm" onclick="return confirm('¿Eliminar?')">Borrar</button>
-          </form>
-        </td>
-      </tr>
-      @empty
-      <tr><td colspan="6" class="text-center">No hay videojuegos.</td></tr>
-      @endforelse
-    </tbody>
-  </table>
-
-  {{ $videojuegos->links() }}
+  <a href="{{ route('admin.videojuegos.create') }}" class="btn btn-primary mb-3">+ Nuevo Juego</a>
+  @if($videojuegos->isEmpty())
+    <p>No hay videojuegos.</p>
+  @else
+    <table class="table table-striped">
+      <thead><tr>
+        <th>ID</th><th>Título</th><th>Plataforma</th><th>Precio</th><th>Creado</th><th>Acciones</th>
+      </tr></thead>
+      <tbody>
+        @foreach($videojuegos as $j)
+        <tr>
+          <td>{{ $j->id }}</td>
+          <td>{{ $j->titulo }}</td>
+          <td>{{ $j->plataforma }}</td>
+          <td>€{{ number_format($j->precio,2) }}</td>
+          <td>{{ $j->created_at->format('Y-m-d') }}</td>
+          <td>
+            <a class="btn btn-sm btn-info"  href="{{ route('admin.videojuegos.show', $j) }}">Ver</a>
+            <a class="btn btn-sm btn-warning" href="{{ route('admin.videojuegos.edit', $j) }}">Editar</a>
+            <form action="{{ route('admin.videojuegos.destroy', $j) }}" method="POST" style="display:inline" onsubmit="return confirm('¿Borrar?');">
+              @csrf @method('DELETE')
+              <button class="btn btn-sm btn-danger">Borrar</button>
+            </form>
+          </td>
+        </tr>
+        @endforeach
+      </tbody>
+    </table>
+    {{ $videojuegos->links() }}
+  @endif
 </div>
 @endsection
