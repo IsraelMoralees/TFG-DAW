@@ -1,13 +1,23 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
-  <h1>{{ $videojuego->titulo }}</h1>
-  <img src="{{ $videojuego->imagen }}" alt="{{ $videojuego->titulo }}" class="img-fluid mb-4">
-  <p>{{ $videojuego->descripcion }}</p>
-  <p><strong>Plataforma:</strong> {{ $videojuego->plataforma }}</p>
-  <p><strong>Precio:</strong> €{{ number_format($videojuego->precio,2) }}</p>
-  <a href="{{ route('catalogo') }}" class="btn btn-secondary mt-3">← Volver al catálogo</a>
+<div class="container py-4">
+    <h1 class="mb-3">{{ $videojuego->titulo }}</h1>
+    <p>{{ $videojuego->descripcion }}</p>
+    <p><strong>Plataforma:</strong> {{ $videojuego->plataforma }}</p>
+    <p><strong>Precio:</strong> €{{ $videojuego->precio }}</p>
+
+    @auth
+    <form action="{{ route('purchase.checkout', $videojuego) }}" method="POST">
+        @csrf
+        <button type="submit" class="btn btn-success">
+            Comprar ahora
+        </button>
+    </form>
+    @else
+    <a href="{{ route('login') }}" class="btn btn-primary">
+        Inicia sesión para comprar
+    </a>
+    @endauth
 </div>
 @endsection
-
