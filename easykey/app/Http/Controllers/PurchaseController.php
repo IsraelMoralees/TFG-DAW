@@ -21,6 +21,11 @@ class PurchaseController extends Controller
             ->where('sold', false)
             ->firstOrFail();
 
+        // Genera sólo la URL base al controlador de éxito, sin session_id todavía
+        $baseSuccessUrl = route('purchase.success', [
+            'videojuego' => $videojuego->id,
+        ]);
+
         $session = Session::create([
             'payment_method_types' => ['card'],
             'line_items' => [[
@@ -33,15 +38,13 @@ class PurchaseController extends Controller
             ]],
             'mode'        => 'payment',
             'metadata'    => ['key_id' => $key->id],
-            'success_url' => route('purchase.success', [
-                'session_id'  => '{CHECKOUT_SESSION_ID}',
-                'videojuego' => $videojuego->id
-            ]),
+            'success_url' => $baseSuccessUrl.'?session_id={CHECKOUT_SESSION_ID}',
             'cancel_url'  => route('catalogo.show', $videojuego),
         ]);
 
         return redirect($session->url);
     }
+
 
     public function success(Request $request, Videojuego $videojuego)
     {
