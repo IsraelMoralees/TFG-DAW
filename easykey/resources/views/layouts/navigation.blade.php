@@ -28,6 +28,11 @@
 
       <!-- Menú derecho -->
       <div class="hidden sm:flex sm:items-center sm:ml-6">
+        <!-- Buscador -->
+        <div class="relative list-none mr-6">
+          <x-search-dropdown :action="route('catalogo')" />
+        </div>
+
         @guest
           <a href="{{ route('login') }}"
              class="text-sm text-gray-700 dark:text-gray-500 underline">
@@ -98,6 +103,12 @@
       <x-responsive-nav-link :href="route('catalogo')" :active="request()->routeIs('catalogo*')">
         {{ __('Catálogo') }}
       </x-responsive-nav-link>
+
+      <!-- Buscador móvil (simple) -->
+      <x-responsive-nav-link href="#" @click.prevent="open = false; $refs.search.open = true">
+        🔍 {{ __('Buscar…') }}
+      </x-responsive-nav-link>
+
       @auth
         <x-responsive-nav-link :href="route('purchase.index')" :active="request()->routeIs('purchase.index')">
           {{ __('Mis compras') }}
@@ -132,7 +143,6 @@
           </div>
         </div>
         <div class="mt-3 space-y-1">
-          <!-- Log Out -->
           <form method="POST" action="{{ route('logout') }}">
             @csrf
             <x-responsive-nav-link href="{{ route('logout') }}"
@@ -145,4 +155,3 @@
     </div>
   </div>
 </nav>
-
