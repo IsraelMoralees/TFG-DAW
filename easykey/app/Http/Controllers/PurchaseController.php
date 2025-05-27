@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\Videojuego;
@@ -9,44 +8,78 @@ use Illuminate\Http\Request;
 use Stripe\Stripe;
 use Stripe\Checkout\Session;
 use Illuminate\Support\Facades\Auth;
-
+use Illuminate\Support\Facades\Session as CartSession;
 
 class PurchaseController extends Controller
 {
-    public function checkout(Videojuego $videojuego)
-    {
-        Stripe::setApiKey(config('services.stripe.secret'));
+    // …
 
-        $key = Key::where('videojuego_id', $videojuego->id)
-            ->where('sold', false)
-            ->firstOrFail();
+    /**
+     * Checkout de todo el carrito.
+     */
+    public function checkoutCart(Request $request)
+{
+    Stripe::setApiKey(config('services.stripe.secret'));
 
-        // Genera sólo la URL base al controlador de éxito, sin session_id todavía
-        $baseSuccessUrl = route('purchase.success', [
-            'videojuego' => $videojuego->id,
-        ]);
-
-        $session = Session::create([
-            'payment_method_types' => ['card'],
-            'line_items' => [[
-                'price_data' => [
-                    'currency'     => 'eur',
-                    'unit_amount'  => intval($videojuego->precio * 100),
-                    'product_data' => ['name' => $videojuego->titulo],
-                ],
-                'quantity' => 1,
-            ]],
-            'mode'        => 'payment',
-            'metadata'    => ['key_id' => $key->id],
-            'success_url' => $baseSuccessUrl.'?session_id={CHECKOUT_SESSION_ID}',
-            'cancel_url'  => route('catalogo.show', $videojuego),
-        ]);
-
-        return redirect($session->url);
+    // Recupera el carrito: [videojuego_id => cantidad, ...]
+    $cart = CartSession::get('cart', []);
+    if (empty($cart)) {
+        return redirect()->route('cart.index')
+                         ->with('error', 'Tu carrito está vacío.');
     }
 
+    $lineItems    = [];
+    $metadataKeys = []; // inicializamos el array
 
-    public function success(Request $request, Videojuego $videojuego)
+    foreach ($cart as $videojuegoId => $qty) {
+        $juego = Videojuego::findOrFail($videojuegoId);
+
+        for ($i = 0; $i < $qty; $i++) {
+            // 1) sacamos la key libre
+            $key = Key::where('videojuego_id', $videojuegoId)
+                      ->where('sold', false)
+                      ->firstOrFail();
+
+            // 2) marcamos YA como vendida (reservamos)
+            $key->sold = true;
+            $key->save();
+
+            // 3) la metemos en metadata
+            $metadataKeys[] = $key->id;
+
+            // 4) añadimos la línea a Stripe
+            $lineItems[] = [
+                'price_data' => [
+                    'currency'     => 'eur',
+                    'unit_amount'  => intval($juego->precio * 100),
+                    'product_data' => ['name' => $juego->titulo],
+                ],
+                'quantity' => 1,
+            ];
+        }
+    }
+
+    // Creamos la sesión de Stripe con todas las keys reservadas
+    $session = Session::create([
+        'payment_method_types' => ['card'],
+        'line_items'           => $lineItems,
+        'mode'                 => 'payment',
+        'metadata'             => [
+            'key_ids' => implode(',', $metadataKeys),
+        ],
+        'success_url'          => route('purchase.cart.success')
+                                   . '?session_id={CHECKOUT_SESSION_ID}',
+        'cancel_url'           => route('cart.cancel'),
+    ]);
+
+    return redirect($session->url);
+}
+
+
+    /**
+     * Callback de éxito para el carrito completo.
+     */
+    public function cartSuccess(Request $request)
     {
         Stripe::setApiKey(config('services.stripe.secret'));
         $session = Session::retrieve($request->query('session_id'));
@@ -55,31 +88,39 @@ class PurchaseController extends Controller
             abort(403, 'Pago no confirmado.');
         }
 
-        $key = Key::findOrFail($session->metadata->key_id);
+        // 3) Recuperamos todas las claves vendidas
+        $keyIds = explode(',', $session->metadata->key_ids);
 
-        if (! $key->sold) {
-            $key->sold = true;
-            $key->save();
+        foreach ($keyIds as $keyId) {
+            $key = Key::findOrFail($keyId);
 
-            Purchase::create([
-                'user_id'       => Auth::id(),
-                'videojuego_id' => $videojuego->id,
-                'key_id'        => $key->id,
-                'purchased_at'  => now(),
-            ]);
+            if (! $key->sold) {
+                $key->sold = true;
+                $key->save();
+
+                Purchase::create([
+                    'user_id'       => Auth::id(),
+                    'videojuego_id' => $key->videojuego_id,
+                    'key_id'        => $key->id,
+                    'purchased_at'  => now(),
+                ]);
+            }
         }
+
+        // 4) Vaciamos carrito
+        CartSession::forget('cart');
 
         return redirect()
             ->route('purchase.index')
-            ->with('success', "Compra completada. Tu clave: {$key->key_code}");
+            ->with('success', 'Compra del carrito completada con éxito.');
     }
 
+    /**
+     * Historial de compras.
+     */
     public function index()
     {
-        /** @var \App\Models\User $user */
-        $user = Auth::user();
-
-        $purchases = $user
+        $purchases = Auth::user()
             ->purchases()
             ->with('videojuego', 'key')
             ->latest()

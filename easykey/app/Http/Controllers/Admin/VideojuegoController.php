@@ -65,7 +65,7 @@ class VideojuegoController extends Controller
             'plataforma'   => 'required|max:100',
             'precio'       => 'required|numeric|min:0',
             'imagen'       => 'nullable|url',
-        'imagen'      => 'nullable|image|mimes:jpg,jpeg,png,gif,svg|max:2048',
+            'imagen'      => 'nullable|image|mimes:jpg,jpeg,png,gif,svg|max:2048',
         ]);
 
         if ($request->hasFile('imagen_file')) {

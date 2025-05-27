@@ -41,5 +41,9 @@ class VideojuegoController extends Controller
 
         return view('catalogo', compact('videojuegos','platforms'));
     }
+    public function show(Videojuego $videojuego)
+    {
+        return view('catalogo.show', compact('videojuego'));
+    }
 
 }

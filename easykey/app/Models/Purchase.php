@@ -1,8 +1,8 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class Purchase extends Model
 {
@@ -13,10 +13,14 @@ class Purchase extends Model
         'purchased_at',
     ];
 
-    // Indica a Laravel que "purchased_at" es un datetime
     protected $casts = [
         'purchased_at' => 'datetime',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
     public function videojuego()
     {
@@ -26,10 +30,5 @@ class Purchase extends Model
     public function key()
     {
         return $this->belongsTo(Key::class);
-    }
-
-    public function user()
-    {
-        return $this->belongsTo(User::class);
     }
 }
