@@ -33,17 +33,24 @@ class VideojuegoController extends Controller
         $videojuegos = $query
             ->orderBy('created_at','desc')
             ->paginate(12)
-            // Mantener los parámetros en los links de paginación
             ->appends($request->only(['q','plataforma','min_price','max_price']));
 
-        // Lista de plataformas para rellenar el select
+        // Lista de plataformas para el filtro
         $platforms = Videojuego::select('plataforma')->distinct()->pluck('plataforma');
 
         return view('catalogo', compact('videojuegos','platforms'));
     }
+
     public function show(Videojuego $videojuego)
     {
-        return view('catalogo.show', compact('videojuego'));
-    }
+        // Recupera hasta 4 juegos de la misma plataforma (excluyendo el actual)
+        $relacionados = Videojuego::where('plataforma', $videojuego->plataforma)
+                          ->where('id', '!=', $videojuego->id)
+                          ->inRandomOrder()
+                          ->take(4)
+                          ->get();
 
+        // Envía el videojuego y los relacionados a la vista
+        return view('catalogo.show', compact('videojuego', 'relacionados'));
+    }
 }

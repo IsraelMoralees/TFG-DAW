@@ -2,125 +2,112 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="max-w-6xl mx-auto py-12 px-4">
-  <div class="flex flex-col md:flex-row bg-gray-800 dark:bg-gray-900 rounded-2xl shadow-xl overflow-hidden">
-    
+<div class="max-w-6xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+  <div class="flex flex-col md:flex-row bg-white/10 backdrop-blur-lg border border-white/20 shadow-xl rounded-2xl overflow-hidden">
+
     {{-- ========== COLUMNA IZQUIERDA (Imagen) ========== --}}
     <div class="md:w-1/2 w-full">
       @if($videojuego->imagen)
-        <img
-          src="{{ asset($videojuego->imagen) }}"
-          alt="{{ $videojuego->titulo }}"
-          class="w-full h-80 md:h-full object-cover"
-        >
+      <img
+        src="{{ asset($videojuego->imagen) }}"
+        alt="{{ $videojuego->titulo }}"
+        class="w-full h-80 md:h-full object-cover">
       @else
-        <div class="w-full h-80 md:h-full bg-gray-700 flex items-center justify-center">
-          <span class="text-gray-400">Sin imagen disponible</span>
-        </div>
+      <div class="w-full h-80 md:h-full bg-gray-700 flex items-center justify-center">
+        <span class="text-gray-400">Sin imagen disponible</span>
+      </div>
       @endif
     </div>
 
     {{-- ========== COLUMNA DERECHA (Información) ========== --}}
-    <div class="md:w-1/2 w-full p-6 md:p-12 flex flex-col justify-between space-y-6">
-      
-      {{-- Título --}}
-      <h1 class="text-3xl md:text-4xl font-display text-purple-300">
+    <div class="md:w-1/2 w-full p-6 md:p-12 flex flex-col justify-between">
+
+      {{-- TÍTULO --}}
+      <h1 class="text-3xl md:text-4xl font-bold text-white mb-4">
         {{ $videojuego->titulo }}
       </h1>
 
-      {{-- Metadatos --}}
-      <div class="flex flex-wrap items-center space-x-6 text-gray-400 text-sm md:text-base">
-        {{-- Icono PC --}}
-        <span class="flex items-center space-x-2">
-          <!-- SVG PC -->
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none"
-               viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M9.75 17L9 20h6l-.75-3m3.75-8.75V4.75A2.75 2.75 0 0016.25 2H7.75A2.75 2.75 0 005 4.75v8.5M3 13h18"/>
-          </svg>
-          <span>PC</span>
-        </span>
-
-        {{-- Icono Stock --}}
-        <span class="flex items-center space-x-2">
-          <!-- SVG Check -->
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-green-400" fill="none"
-               viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M5 13l4 4L19 7"/>
-          </svg>
-          <span>En stock</span>
-        </span>
-
-        {{-- Icono Digital --}}
-        <span class="flex items-center space-x-2">
-          <!-- SVG Cloud Download -->
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-green-400" fill="none"
-               viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M8 16h8M8 12h8m-8-4h8M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5"/>
-          </svg>
-          <span>Descarga digital</span>
+      {{-- Ícono y texto de plataforma dinámico --}}
+      @php
+      $iconos = [
+      'PC' => 'M9.75 17L9 20h6l-.75-3m3.75-8.75V4.75A2.75 2.75 0 0016.25 2H7.75A2.75 2.75 0 005 4.75v8.5M3 13h18',
+      'Xbox' => 'M12 2a10 10 0 100 20 10 10 0 000-20z', // ejemplo: círculo
+      'PS5' => 'M8 2h8v20H8z', // ejemplo: rectángulo
+      'Switch' => 'M6 4h12v16H6z', // ejemplo: otro rect.
+      ];
+      $plataforma = $videojuego->plataforma;
+      $svgPath = $iconos[$plataforma] ?? $iconos['PC'];
+      @endphp
+      <div class="flex items-center text-gray-300 mb-6 space-x-3">
+        <svg xmlns="http://www.w3.org/2000/svg"
+          class="w-6 h-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="{{ $svgPath }}" />
+        </svg>
+        <span>
+          Plataforma: <strong class="text-white">{{ $plataforma }}</strong>
         </span>
       </div>
 
-      {{-- Descripción --}}
-      <p class="text-gray-300 leading-relaxed">
+      {{-- DESCRIPCIÓN --}}
+      <p class="text-gray-200 leading-relaxed mb-8">
         {{ $videojuego->descripcion }}
       </p>
 
-      {{-- Selector de edición --}}
-      <select class="w-full md:w-2/3 bg-gray-700 border border-gray-600 rounded-md px-4 py-2 text-white">
-        <option>Standard Edición</option>
-        <option>Deluxe Edición</option>
-      </select>
+      {{-- PRECIO REAL --}}
+      <div class="mb-8">
+        <span class="text-2xl text-white font-bold">
+          €{{ number_format($videojuego->precio, 2) }}
+        </span>
+      </div>
 
-      {{-- Precio + CTA --}}
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
-        <div class="space-x-2 text-xl md:text-2xl text-white">
-          <span class="line-through text-gray-500">€50</span>
-          <span class="text-red-500">-43%</span>
-          <span class="font-bold text-3xl">28.59 €</span>
-        </div>
-
-        <div class="flex space-x-4 w-full sm:w-auto">
-          {{-- Corazón (wishlist) --}}
-          <button class="p-3 bg-purple-700 rounded-lg hover:bg-purple-600 transition">
-            <!-- SVG corazón -->
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-white" fill="none"
-                 viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M4.318 6.318a4.5 4.5 0 016.364 0L12
-                       7.636l1.318-1.318a4.5 4.5 0
-                       116.364 6.364L12 21.364l-7.682-7.682a4.5 4.5 0
-                       010-6.364z"/>
-            </svg>
+      {{-- BOTONES DE ACCIÓN --}}
+      <div class="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
+        {{-- Añadir a la cesta --}}
+        <form action="{{ route('cart.add', $videojuego) }}" method="POST" class="flex-1">
+          @csrf
+          <button type="submit"
+            class="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-500
+                         hover:from-indigo-600 hover:to-purple-600 text-white 
+                         font-medium rounded-lg transition">
+            Añadir a la cesta
           </button>
-
-          {{-- Añadir al carrito --}}
-          <form action="{{ route('cart.add', $videojuego) }}" method="POST">
-            @csrf
-            <button type="submit"
-                    class="px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white font-medium
-                           rounded-lg transition">
-              Añadir a la cesta
-            </button>
-          </form>
-
-          {{-- Comprar ahora --}}
-          <form action="{{ route('purchase.checkout', $videojuego) }}" method="POST" class="flex-1">
-            @csrf
-            <button type="submit"
-                    class="w-full py-3 bg-gradient-to-r from-purple-600 to-pink-500
-                           hover:from-purple-700 hover:to-pink-600 text-white font-medium
-                           rounded-lg transition">
-              Comprar ahora
-            </button>
-          </form>
-        </div>
+        </form>
+        {{-- Comprar ahora --}}
+        <form action="{{ route('purchase.checkout', $videojuego) }}" method="POST" class="flex-1">
+          @csrf
+          <button type="submit"
+            class="w-full py-3 bg-gradient-to-r from-purple-500 to-pink-500
+                         hover:from-purple-600 hover:to-pink-600 text-white 
+                         font-medium rounded-lg transition">
+            Comprar ahora
+          </button>
+        </form>
       </div>
     </div>
-
   </div>
+  <div class="mt-12">
+      <h2 class="text-xl font-semibold text-white mb-4">Juegos relacionados</h2>
+      <div class="flex space-x-4 overflow-x-auto pb-2">
+        @foreach($relacionados as $rel)
+          <a href="{{ route('catalogo.show', $rel) }}"
+             class="min-w-[200px] bg-white/10 backdrop-blur-sm border border-white/20 
+                    rounded-lg overflow-hidden flex-shrink-0 hover:scale-105 transition">
+            <img src="{{ asset($rel->imagen) }}"
+                 alt="{{ $rel->titulo }}"
+                 class="w-full h-32 object-cover">
+            <div class="p-3 text-white">
+              <h3 class="font-medium text-lg">{{ $rel->titulo }}</h3>
+              <p class="text-sm text-gray-300">{{ $rel->plataforma }}</p>
+            </div>
+          </a>
+        @endforeach
+      </div>
+    </div>
 </div>
 @endsection
