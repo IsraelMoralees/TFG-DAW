@@ -6,7 +6,7 @@
     <div class="bg-gradient-to-br from-purple-600 to-indigo-600 rounded-2xl p-8 w-full max-w-md mx-auto">
 
         <!-- Registration Card -->
-        <div class="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl shadow-xl p-6">
+        <div class="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl shadow-xl p-2">
             <!-- Session Status -->
             <x-auth-session-status class="mb-4 text-white/90" :status="session('status')" />
 
@@ -29,7 +29,7 @@
                 </div>
 
                 <!-- Password & Confirm Password Side by Side -->
-                <div class="grid grid-cols-2 gap-4">
+                <div class="space-y-4">
                     <!-- Password -->
                     <div>
                         <x-input-label for="password" :value="__('Contraseña')" class="text-white" />
