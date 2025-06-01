@@ -9,67 +9,75 @@ use App\Http\Controllers\Admin\KeyController         as AdminKeyController;
 use App\Http\Controllers\Admin\UserController        as AdminUserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\ContactController;
+use App\Models\Videojuego; // <-- Importamos tu modelo
+// ----------------------------------------------------
 
-
+// Ruta de inicio: obtiene 3 juegos aleatorios y los pasa a home.blade.php
 Route::get('/', function () {
-    return view('home');
+    // Tomamos 3 videojuegos al azar (puedes cambiar la lógica si prefieres últimos agregados, etc.)
+    $promocionados = Videojuego::inRandomOrder()->take(3)->get();
+
+    return view('home', compact('promocionados'));
 })->name('home');
+
 // ----------------------------------------------------
 // Dashboard
 // ----------------------------------------------------
 Route::get('/dashboard', function () {
-     return view('dashboard');
+    return view('dashboard');
 })
-     ->middleware(['auth', 'verified'])
-     ->name('dashboard');
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 
 // ----------------------------------------------------
 // Perfil de usuario (incluye historial de compras + Stripe)
 // ----------------------------------------------------
 Route::middleware('auth')->group(function () {
-     // Edición de perfil
-     Route::get('/profile',                 [ProfileController::class, 'edit'])->name('profile.edit');
-     Route::patch('/profile',                 [ProfileController::class, 'update'])->name('profile.update');
-     Route::delete('/profile',                 [ProfileController::class, 'destroy'])->name('profile.destroy');
+    // Edición de perfil
+    Route::get('/profile',    [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile',  [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-     // Stripe Checkout
-     Route::post('/catalogo/{videojuego}/checkout', [PurchaseController::class, 'checkout'])
-          ->name('purchase.checkout');
+    // Stripe Checkout (compra de un solo videojuego)
+    Route::post('/catalogo/{videojuego}/checkout', [PurchaseController::class, 'checkout'])
+         ->name('purchase.checkout');
 
-     Route::get('/purchase/success/{videojuego}',    [PurchaseController::class, 'success'])
-          ->name('purchase.success');
+    // Callback de éxito para compra individual
+    Route::get('/purchase/single/success', [PurchaseController::class, 'singleSuccess'])
+         ->name('purchase.single.success');
 
-     // Historial de compras
-     Route::get('/mis-compras',                       [PurchaseController::class, 'index'])
-          ->name('purchase.index');
+    // Historial de compras
+    Route::get('/mis-compras', [PurchaseController::class, 'index'])
+         ->name('purchase.index');
 });
 
 // ----------------------------------------------------
 // Catálogo público
 // ----------------------------------------------------
-Route::get('/catalogo',               [VideojuegoController::class, 'index'])->name('catalogo');
-Route::get('/catalogo/{videojuego}',  [VideojuegoController::class, 'show'])->name('catalogo.show');
+Route::get('/catalogo',              [VideojuegoController::class, 'index'])->name('catalogo');
+Route::get('/catalogo/{videojuego}', [VideojuegoController::class, 'show'])->name('catalogo.show');
 
 // ----------------------------------------------------
 // Panel de administración (único grupo)
 // ----------------------------------------------------
 Route::middleware(['auth', AdminMiddleware::class])
-     ->prefix('admin')
-     ->name('admin.')
-     ->group(function () {
-          // 1) CRUD de Videojuegos
-          Route::resource('videojuegos',   AdminVideojuegoController::class);
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+         // 1) CRUD de Videojuegos
+         Route::resource('videojuegos', AdminVideojuegoController::class);
 
-          // 2) CRUD de Keys (anidado bajo videojuego)
-          Route::resource('videojuegos.keys', AdminKeyController::class)
-               ->shallow();
+         // 2) CRUD de Keys (anidado bajo videojuego)
+         Route::resource('videojuegos.keys', AdminKeyController::class)
+              ->shallow();
 
-          // 3) CRUD de Usuarios
-          Route::get('users',              [AdminUserController::class, 'index'])->name('users.index');
-          Route::get('users/{user}/edit',  [AdminUserController::class, 'edit'])->name('users.edit');
-          Route::put('users/{user}',       [AdminUserController::class, 'update'])->name('users.update');
-          Route::delete('users/{user}',       [AdminUserController::class, 'destroy'])->name('users.destroy');
-     });
+         // 3) CRUD de Usuarios
+         Route::get('users',             [AdminUserController::class, 'index'])->name('users.index');
+         Route::get('users/{user}/edit', [AdminUserController::class, 'edit'])->name('users.edit');
+         Route::put('users/{user}',      [AdminUserController::class, 'update'])->name('users.update');
+         Route::delete('users/{user}',   [AdminUserController::class, 'destroy'])->name('users.destroy');
+    });
 
 // ----------------------------------------------------
 // Carro de compras
@@ -96,6 +104,9 @@ Route::get('/cart/checkout/success', [PurchaseController::class, 'cartSuccess'])
 // 6) Callback de cancelación de Stripe para carrito
 Route::get('/cart/checkout/cancel', [PurchaseController::class, 'cartError'])
      ->name('cart.cancel');
+
+// Ruta contacto
+Route::view('/contacto', 'contacto')->name('contacto');
 
 // ----------------------------------------------------
 // Auth routes (Breeze / Fortify / etc.)

@@ -5,7 +5,8 @@
         ? route('admin.videojuegos.update', $videojuego)
         : route('admin.videojuegos.store') }}"
     method="POST"
-    enctype="multipart/form-data" {{-- ¡MUY IMPORTANTE! --}}
+    enctype="multipart/form-data"
+    class="space-y-6"
 >
     @csrf
     @if(isset($videojuego))
@@ -13,67 +14,97 @@
     @endif
 
     {{-- Título --}}
-    <div class="mb-3">
-      <label class="form-label">Título</label>
+    <div class="flex flex-col">
+      <label class="text-gray-300 mb-1">Título</label>
       <input 
         name="titulo"
         value="{{ old('titulo', $videojuego->titulo ?? '') }}"
-        class="form-control"
+        class="w-full bg-white/10 border border-white/20 rounded-2xl text-white px-3 py-2 
+               focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        placeholder="Introduce el título"
       >
-      @error('titulo')<small class="text-danger">{{ $message }}</small>@enderror
+      @error('titulo')
+        <small class="text-red-400 mt-1">{{ $message }}</small>
+      @enderror
     </div>
 
     {{-- Descripción --}}
-    <div class="mb-3">
-      <label class="form-label">Descripción</label>
+    <div class="flex flex-col">
+      <label class="text-gray-300 mb-1">Descripción</label>
       <textarea
         name="descripcion"
-        class="form-control"
+        rows="4"
+        class="w-full bg-white/10 border border-white/20 rounded-2xl text-white px-3 py-2 
+               focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        placeholder="Escribe una descripción"
       >{{ old('descripcion', $videojuego->descripcion ?? '') }}</textarea>
-      @error('descripcion')<small class="text-danger">{{ $message }}</small>@enderror
+      @error('descripcion')
+        <small class="text-red-400 mt-1">{{ $message }}</small>
+      @enderror
     </div>
 
-    <div class="row">
-      <div class="col-md-6 mb-3">
-        <label class="form-label">Plataforma</label>
+    {{-- Plataforma y Precio --}}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {{-- Plataforma --}}
+      <div class="flex flex-col">
+        <label class="text-gray-300 mb-1">Plataforma</label>
         <input 
           name="plataforma"
           value="{{ old('plataforma', $videojuego->plataforma ?? '') }}"
-          class="form-control"
+          class="w-full bg-white/10 border border-white/20 rounded-2xl text-white px-3 py-2 
+                 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          placeholder="Ej: PC, PS5, Xbox"
         >
-        @error('plataforma')<small class="text-danger">{{ $message }}</small>@enderror
+        @error('plataforma')
+          <small class="text-red-400 mt-1">{{ $message }}</small>
+        @enderror
       </div>
-      <div class="col-md-6 mb-3">
-        <label class="form-label">Precio (€)</label>
+
+      {{-- Precio --}}
+      <div class="flex flex-col">
+        <label class="text-gray-300 mb-1">Precio (€)</label>
         <input 
           name="precio"
           type="number"
           step="0.01"
           value="{{ old('precio', $videojuego->precio ?? '') }}"
-          class="form-control"
+          class="w-full bg-white/10 border border-white/20 rounded-2xl text-white px-3 py-2 
+                 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          placeholder="0.00"
         >
-        @error('precio')<small class="text-danger">{{ $message }}</small>@enderror
+        @error('precio')
+          <small class="text-red-400 mt-1">{{ $message }}</small>
+        @enderror
       </div>
     </div>
 
-    {{-- Nuevo campo: subir fichero --}}
-    <div class="mb-3">
-      <label class="form-label">Subir imagen</label>
+    {{-- Subir imagen --}}
+    <div class="flex flex-col">
+      <label class="text-gray-300 mb-1">Subir imagen</label>
       <input 
         name="imagen_file"
         type="file"
         accept="image/*"
-        class="form-control"
+        class="text-gray-300 bg-white/10 border border-white/20 rounded-2xl px-3 py-2 
+               focus:outline-none focus:ring-2 focus:ring-indigo-500"
       >
-      @error('imagen_file')<small class="text-danger">{{ $message }}</small>@enderror
+      @error('imagen_file')
+        <small class="text-red-400 mt-1">{{ $message }}</small>
+      @enderror
     </div>
 
     {{-- Botones --}}
-    <div class="d-flex gap-2">
-      <button type="submit" class="btn btn-primary">
+    <div class="flex flex-wrap gap-4 mt-4">
+      <button type="submit"
+              class="bg-gradient-to-r from-indigo-500 to-purple-500 
+                     text-white font-semibold px-5 py-2 rounded-2xl shadow-lg 
+                     hover:from-purple-500 hover:to-pink-500 transform transition duration-200">
         {{ isset($videojuego) ? 'Actualizar' : 'Crear' }}
       </button>
-      <a href="{{ route('admin.videojuegos.index') }}" class="btn btn-secondary">
+      <a href="{{ route('admin.videojuegos.index') }}"
+         class="bg-gradient-to-r from-gray-600 to-gray-700 
+                text-white font-semibold px-5 py-2 rounded-2xl shadow-lg 
+                hover:from-gray-500 hover:to-gray-600 transform transition duration-200">
         Cancelar
       </a>
     </div>

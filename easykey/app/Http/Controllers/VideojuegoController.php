@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Videojuego;
+use App\Models\Key;
+use Illuminate\Http\Request;
 
 class VideojuegoController extends Controller
 {
@@ -50,7 +51,12 @@ class VideojuegoController extends Controller
                           ->take(4)
                           ->get();
 
-        // Envía el videojuego y los relacionados a la vista
-        return view('catalogo.show', compact('videojuego', 'relacionados'));
+        // Verificar si hay al menos 1 key sin vender para este videojuego
+        $inStock = Key::where('videojuego_id', $videojuego->id)
+                      ->where('sold', false)
+                      ->exists();
+
+        // Envía el videojuego, los relacionados y el flag “inStock” a la vista
+        return view('catalogo.show', compact('videojuego', 'relacionados', 'inStock'));
     }
 }
