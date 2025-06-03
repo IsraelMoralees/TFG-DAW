@@ -64,30 +64,72 @@
         </span>
       </div>
 
-      {{-- Si hay stock, mostramos los botones; si no, sólo “Sin stock” --}}
+      {{-- Si hay stock, mostramos el desplegable de cantidad + formularios; si no, “Sin stock” --}}
       @if($inStock)
-        <div class="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
-          {{-- Añadir a la cesta --}}
-          <form action="{{ route('cart.add', $videojuego) }}" method="POST" class="flex-1">
+        <div class="space-y-6">
+
+          {{-- === Formulario: Añadir a la cesta === --}}
+          <form action="{{ route('cart.add', $videojuego) }}" method="POST"
+                class="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl shadow-xl p-6">
             @csrf
-            <button id="btnAddCart" type="submit"
-                    class="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-500
-                           hover:from-indigo-600 hover:to-purple-600 text-white
-                           font-medium rounded-lg transition-transform duration-200">
-              Añadir a la cesta
+
+            {{-- Desplegable de cantidad específico para “Añadir a la cesta” --}}
+            <div class="mb-4">
+              <label for="quantity_cart" class="block text-sm text-gray-300 mb-1">Cantidad a añadir:</label>
+              <select
+                id="quantity_cart"
+                name="quantity"
+                class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-2xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              >
+                @for($i = 1; $i <= $stockCount; $i++)
+                  <option value="{{ $i }}" class="text-gray-800">{{ $i }}</option>
+                @endfor
+              </select>
+              <p class="mt-1 text-xs text-gray-400">Hasta {{ $stockCount }} unidades disponibles</p>
+            </div>
+
+            {{-- Botón “Añadir a la cesta” --}}
+            <button
+              type="submit"
+              class="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-500
+                     hover:from-indigo-600 hover:to-purple-600 text-white
+                     font-medium rounded-lg transform hover:scale-105 transition-transform duration-200"
+            >
+              Añadir al carrito
             </button>
           </form>
 
-          {{-- Comprar ahora --}}
-          <form action="{{ route('purchase.checkout', $videojuego) }}" method="POST" class="flex-1">
+          {{-- === Formulario: Comprar ahora === --}}
+          <form action="{{ route('purchase.checkout', $videojuego) }}" method="POST"
+                class="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl shadow-xl p-6">
             @csrf
-            <button id="btnBuyNow" type="submit"
-                    class="w-full py-3 bg-gradient-to-r from-purple-500 to-pink-500
-                           hover:from-purple-600 hover:to-pink-600 text-white
-                           font-medium rounded-lg transition-transform duration-200">
+
+            {{-- Desplegable de cantidad específico para “Comprar ahora” --}}
+            <div class="mb-4">
+              <label for="quantity_buy" class="block text-sm text-gray-300 mb-1">Cantidad a comprar:</label>
+              <select
+                id="quantity_buy"
+                name="quantity"
+                class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-2xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              >
+                @for($i = 1; $i <= $stockCount; $i++)
+                  <option value="{{ $i }}" class="text-gray-800">{{ $i }}</option>
+                @endfor
+              </select>
+              <p class="mt-1 text-xs text-gray-400">Hasta {{ $stockCount }} unidades disponibles</p>
+            </div>
+
+            {{-- Botón “Comprar ahora” --}}
+            <button
+              type="submit"
+              class="w-full py-3 bg-gradient-to-r from-purple-500 to-pink-500
+                     hover:from-purple-600 hover:to-pink-600 text-white
+                     font-medium rounded-lg transform hover:scale-105 transition-transform duration-200"
+            >
               Comprar ahora
             </button>
           </form>
+
         </div>
       @else
         <div class="flex items-center justify-center">
@@ -96,6 +138,7 @@
           </span>
         </div>
       @endif
+
     </div>
   </div>
 
@@ -126,7 +169,8 @@
   </div>
 
 </div>
-<!-- Footer -->
+
+{{-- Footer --}}
 <footer class="bg-gradient-to-r from-purple-600 to-indigo-600 py-6">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
     <p class="text-gray-200 text-sm">© {{ date('Y') }} EasyKey. Todos los derechos reservados.</p>
@@ -160,12 +204,9 @@
     if (btnAddCart) {
       btnAddCart.addEventListener('click', function(e) {
         e.preventDefault(); // evitamos que el form se envíe inmediatamente
-        // 1) Podemos mostrar una alerta antes de enviar el form:
         if (confirm("¿Estás seguro de que quieres añadir \"{{ $videojuego->titulo }}\" al carrito?")) {
-          // Si confirma, enviamos el formulario:
           this.closest('form').submit();
         }
-        // Si cancela, no hacemos nada y evitamos el envío.
       });
     }
 

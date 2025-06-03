@@ -36,8 +36,7 @@ class VideojuegoController extends Controller
                 $query->whereHas('keys', function ($q) {
                     $q->where('sold', false);
                 });
-            }
-            elseif ($disp === '0') {
+            } elseif ($disp === '0') {
                 // “Agotado”: no haya ninguna key sin vender
                 $query->whereDoesntHave('keys', function ($q) {
                     $q->where('sold', false);
@@ -46,7 +45,7 @@ class VideojuegoController extends Controller
         }
 
         // 5) Cargar el contador de keys sin vender en cada videojuego
-        $query->withCount(['keys as stock_count' => function($q) {
+        $query->withCount(['keys as stock_count' => function ($q) {
             $q->where('sold', false);
         }]);
 
@@ -55,30 +54,39 @@ class VideojuegoController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(12)
             ->appends($request->only([
-                'q', 'plataforma', 'min_price', 'max_price', 'disponible'
+                'q',
+                'plataforma',
+                'min_price',
+                'max_price',
+                'disponible'
             ]));
 
         // 7) Obtener lista de plataformas para el dropdown
         $platforms = Videojuego::select('plataforma')
-                         ->distinct()
-                         ->pluck('plataforma');
+            ->distinct()
+            ->pluck('plataforma');
 
         return view('catalogo', compact('videojuegos', 'platforms'));
     }
 
     public function show(Videojuego $videojuego)
     {
+        // 1) Recuperar hasta 4 juegos relacionados (sin cambios)
         $relacionados = Videojuego::where('plataforma', $videojuego->plataforma)
-                          ->where('id', '!=', $videojuego->id)
-                          ->inRandomOrder()
-                          ->take(4)
-                          ->get();
+            ->where('id', '!=', $videojuego->id)
+            ->inRandomOrder()
+            ->take(4)
+            ->get();
 
-        // Verificar si hay al menos 1 key sin vender
-        $inStock = \App\Models\Key::where('videojuego_id', $videojuego->id)
-                      ->where('sold', false)
-                      ->exists();
+        // 2) En lugar de exists(), calculamos cuántas keys sin vender hay
+        $stockCount = \App\Models\Key::where('videojuego_id', $videojuego->id)
+            ->where('sold', false)
+            ->count();
 
-        return view('catalogo.show', compact('videojuego', 'relacionados', 'inStock'));
+        // 3) Definimos inStock como boolean si hay al menos 1 unidad
+        $inStock = ($stockCount > 0);
+
+        // 4) Enviamos el videojuego, los relacionados, el booleano y el count
+        return view('catalogo.show', compact('videojuego', 'relacionados', 'inStock', 'stockCount'));
     }
 }
