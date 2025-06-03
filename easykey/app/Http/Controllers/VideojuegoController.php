@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Videojuego;
-use App\Models\Key;
 use Illuminate\Http\Request;
 
 class VideojuegoController extends Controller
@@ -30,33 +29,56 @@ class VideojuegoController extends Controller
             $query->where('precio', '<=', floatval($max));
         }
 
-        // 4) Orden y paginación
+        // 4) Filtro de disponibilidad
+        if (($disp = $request->input('disponible')) !== null) {
+            if ($disp === '1') {
+                // “Disponible”: al menos 1 key sin vender
+                $query->whereHas('keys', function ($q) {
+                    $q->where('sold', false);
+                });
+            }
+            elseif ($disp === '0') {
+                // “Agotado”: no haya ninguna key sin vender
+                $query->whereDoesntHave('keys', function ($q) {
+                    $q->where('sold', false);
+                });
+            }
+        }
+
+        // 5) Cargar el contador de keys sin vender en cada videojuego
+        $query->withCount(['keys as stock_count' => function($q) {
+            $q->where('sold', false);
+        }]);
+
+        // 6) Ordenar y paginar, manteniendo todos los filtros en la URL
         $videojuegos = $query
-            ->orderBy('created_at','desc')
+            ->orderBy('created_at', 'desc')
             ->paginate(12)
-            ->appends($request->only(['q','plataforma','min_price','max_price']));
+            ->appends($request->only([
+                'q', 'plataforma', 'min_price', 'max_price', 'disponible'
+            ]));
 
-        // Lista de plataformas para el filtro
-        $platforms = Videojuego::select('plataforma')->distinct()->pluck('plataforma');
+        // 7) Obtener lista de plataformas para el dropdown
+        $platforms = Videojuego::select('plataforma')
+                         ->distinct()
+                         ->pluck('plataforma');
 
-        return view('catalogo', compact('videojuegos','platforms'));
+        return view('catalogo', compact('videojuegos', 'platforms'));
     }
 
     public function show(Videojuego $videojuego)
     {
-        // Recupera hasta 4 juegos de la misma plataforma (excluyendo el actual)
         $relacionados = Videojuego::where('plataforma', $videojuego->plataforma)
                           ->where('id', '!=', $videojuego->id)
                           ->inRandomOrder()
                           ->take(4)
                           ->get();
 
-        // Verificar si hay al menos 1 key sin vender para este videojuego
-        $inStock = Key::where('videojuego_id', $videojuego->id)
+        // Verificar si hay al menos 1 key sin vender
+        $inStock = \App\Models\Key::where('videojuego_id', $videojuego->id)
                       ->where('sold', false)
                       ->exists();
 
-        // Envía el videojuego, los relacionados y el flag “inStock” a la vista
         return view('catalogo.show', compact('videojuego', 'relacionados', 'inStock'));
     }
 }

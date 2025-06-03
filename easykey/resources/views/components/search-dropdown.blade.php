@@ -63,6 +63,28 @@
         >
       </div>
 
+      <!-- Filtro de disponibilidad -->
+      <select
+        name="disponible"
+        class="w-full mt-2 px-3 py-2 bg-white/10 border border-white/20 rounded-2xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+      >
+        <option value="" class="text-gray-800">— Disponibilidad —</option>
+        <option
+          value="1"
+          @if(request('inStock') === '1') selected @endif
+          class="text-gray-800"
+        >
+          Disponible
+        </option>
+        <option
+          value="0"
+          @if(request('inStock') === '0') selected @endif
+          class="text-gray-800"
+        >
+          Agotado
+        </option>
+      </select>
+
       <button
         type="submit"
         class="mt-3 w-full py-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-2xl hover:from-purple-500 hover:to-pink-500 transform hover:scale-105 transition"
