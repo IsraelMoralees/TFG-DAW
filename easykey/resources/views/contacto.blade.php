@@ -52,7 +52,6 @@
 @endsection
 
 @push('scripts')
-    @vite('resources/js/contact.js')
     <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
