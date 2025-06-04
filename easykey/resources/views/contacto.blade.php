@@ -13,7 +13,7 @@
         <form id="contact-form" class="space-y-6">
             {{-- Nombre --}}
             <div>
-                <label for="name" class="block text-gray-300 mb-2">Nombre</label>
+                <label for="name" class="block text-white font-semibold mb-2">Nombre</label>
                 <input type="text" id="name" name="name" required
                        class="w-full bg-white/20 text-white rounded-lg px-4 py-2 border border-white/30 focus:outline-none focus:ring-2 focus:ring-purple-500"
                        placeholder="Tu nombre">
@@ -21,7 +21,7 @@
 
             {{-- Email --}}
             <div>
-                <label for="email" class="block text-gray-300 mb-2">Correo electrónico</label>
+                <label for="email" class="block text-white font-semibold mb-2">Correo electrónico</label>
                 <input type="email" id="email" name="email" required
                        class="w-full bg-white/20 text-white rounded-lg px-4 py-2 border border-white/30 focus:outline-none focus:ring-2 focus:ring-purple-500"
                        placeholder="ejemplo@correo.com">
@@ -29,7 +29,7 @@
 
             {{-- Mensaje --}}
             <div>
-                <label for="message" class="block text-gray-300 mb-2">Mensaje</label>
+                <label for="message" class="block text-white font-semibold mb-2">Mensaje</label>
                 <textarea id="message" name="message" rows="4" required
                           class="w-full bg-white/20 text-white rounded-lg px-4 py-2 border border-white/30 resize-none focus:outline-none focus:ring-2 focus:ring-purple-500"
                           placeholder="Escribe tu mensaje..."></textarea>
