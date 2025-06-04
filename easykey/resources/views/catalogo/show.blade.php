@@ -14,10 +14,10 @@
         <img
           src="{{ asset($videojuego->imagen) }}"
           alt="{{ $videojuego->titulo }}"
-          class="w-full h-80 md:h-full object-cover"
+          class="w-full h-full object-cover"
         >
       @else
-        <div class="w-full h-80 md:h-full bg-gray-700 flex items-center justify-center">
+        <div class="w-full h-80 bg-gray-700 flex items-center justify-center">
           <span class="text-gray-400">Sin imagen disponible</span>
         </div>
       @endif
@@ -64,18 +64,18 @@
         </span>
       </div>
 
-      {{-- Si hay stock, mostramos el desplegable de cantidad + formularios; si no, “Sin stock” --}}
+      {{-- Si hay stock, mostramos formularios; si no, “Sin stock” --}}
       @if($inStock)
         <div class="space-y-6">
-
-          {{-- === Formulario: Añadir a la cesta === --}}
+          {{-- Formulario: Añadir a la cesta --}}
           <form action="{{ route('cart.add', $videojuego) }}" method="POST"
                 class="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl shadow-xl p-6">
             @csrf
-
-            {{-- Desplegable de cantidad específico para “Añadir a la cesta” --}}
+            {{-- Cantidad a añadir --}}
             <div class="mb-4">
-              <label for="quantity_cart" class="block text-sm text-gray-300 mb-1">Cantidad a añadir:</label>
+              <label for="quantity_cart" class="block text-sm text-gray-300 mb-1">
+                Cantidad a añadir:
+              </label>
               <select
                 id="quantity_cart"
                 name="quantity"
@@ -85,10 +85,11 @@
                   <option value="{{ $i }}" class="text-gray-800">{{ $i }}</option>
                 @endfor
               </select>
-              <p class="mt-1 text-xs text-gray-400">Hasta {{ $stockCount }} unidades disponibles</p>
+              <p class="mt-1 text-xs text-gray-400">
+                Hasta {{ $stockCount }} unidades disponibles
+              </p>
             </div>
-
-            {{-- Botón “Añadir a la cesta” --}}
+            {{-- Botón “Añadir al carrito” --}}
             <button
               type="submit"
               class="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-500
@@ -99,14 +100,15 @@
             </button>
           </form>
 
-          {{-- === Formulario: Comprar ahora === --}}
+          {{-- Formulario: Comprar ahora --}}
           <form action="{{ route('purchase.checkout', $videojuego) }}" method="POST"
                 class="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl shadow-xl p-6">
             @csrf
-
-            {{-- Desplegable de cantidad específico para “Comprar ahora” --}}
+            {{-- Cantidad a comprar --}}
             <div class="mb-4">
-              <label for="quantity_buy" class="block text-sm text-gray-300 mb-1">Cantidad a comprar:</label>
+              <label for="quantity_buy" class="block text-sm text-gray-300 mb-1">
+                Cantidad a comprar:
+              </label>
               <select
                 id="quantity_buy"
                 name="quantity"
@@ -116,9 +118,10 @@
                   <option value="{{ $i }}" class="text-gray-800">{{ $i }}</option>
                 @endfor
               </select>
-              <p class="mt-1 text-xs text-gray-400">Hasta {{ $stockCount }} unidades disponibles</p>
+              <p class="mt-1 text-xs text-gray-400">
+                Hasta {{ $stockCount }} unidades disponibles
+              </p>
             </div>
-
             {{-- Botón “Comprar ahora” --}}
             <button
               type="submit"
@@ -129,7 +132,6 @@
               Comprar ahora
             </button>
           </form>
-
         </div>
       @else
         <div class="flex items-center justify-center">
@@ -138,7 +140,6 @@
           </span>
         </div>
       @endif
-
     </div>
   </div>
 
@@ -147,13 +148,17 @@
     <h2 class="text-2xl font-semibold text-white mb-6">Juegos relacionados</h2>
     <div class="inline-grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 justify-center">
       @foreach($relacionados as $rel)
-        <a href="{{ route('catalogo.show', $rel) }}"
-           class="w-64 bg-white/10 backdrop-blur-lg border border-white/20
-                  rounded-2xl shadow-xl overflow-hidden hover:scale-105 transform transition-transform duration-200">
+        <a
+          href="{{ route('catalogo.show', $rel) }}"
+          class="w-64 bg-white/10 backdrop-blur-lg border border-white/20
+                 rounded-2xl shadow-xl overflow-hidden hover:scale-105 transform transition-transform duration-200"
+        >
           @if($rel->imagen)
-            <img src="{{ asset($rel->imagen) }}"
-                 alt="{{ $rel->titulo }}"
-                 class="w-full h-32 object-cover">
+            <img
+              src="{{ asset($rel->imagen) }}"
+              alt="{{ $rel->titulo }}"
+              class="w-full h-32 object-cover"
+            >
           @else
             <div class="w-full h-32 bg-gray-700 flex items-center justify-center">
               <span class="text-gray-400 text-sm">Sin imagen</span>
@@ -195,29 +200,3 @@
   </div>
 </footer>
 @endsection
-
-{{-- Aquí “pushamos” un JS que se ejecutará sólo en esta vista --}}
-@push('scripts')
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const btnAddCart = document.getElementById('btnAddCart');
-    if (btnAddCart) {
-      btnAddCart.addEventListener('click', function(e) {
-        e.preventDefault(); // evitamos que el form se envíe inmediatamente
-        if (confirm("¿Estás seguro de que quieres añadir \"{{ $videojuego->titulo }}\" al carrito?")) {
-          this.closest('form').submit();
-        }
-      });
-    }
-
-    const btnBuyNow = document.getElementById('btnBuyNow');
-    if (btnBuyNow) {
-      btnBuyNow.addEventListener('click', function(e) {
-        e.preventDefault();
-        alert("Redirigiendo a la pasarela de pago para \"{{ $videojuego->titulo }}\"...");
-        this.closest('form').submit();
-      });
-    }
-  });
-</script>
-@endpush

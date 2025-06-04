@@ -2,13 +2,6 @@
   @section('content')
   <div class="container mx-auto px-4 py-4">
     <div class="flex flex-col md:flex-row bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl shadow-xl p-6">
-      <!-- Imagen del videojuego -->
-      <div class="md:w-1/3 mb-6 md:mb-0">
-        <img src="{{ $videojuego->imagen }}" 
-            alt="{{ $videojuego->titulo }}" 
-            class="w-full rounded-2xl shadow-lg">
-      </div>
-
       <!-- Información del videojuego -->
       <div class="md:w-2/3 md:pl-6">
         <h1 class="text-white text-4xl font-bold mb-4">{{ $videojuego->titulo }}</h1>

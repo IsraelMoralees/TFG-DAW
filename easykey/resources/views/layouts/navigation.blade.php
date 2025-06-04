@@ -54,11 +54,6 @@
                 </x-dropdown-link>
               </x-slot>
             </x-dropdown>
-          @else
-            {{-- Si no es admin, puedes mostrar “Mis compras” o lo que necesites --}}
-            <x-nav-link :href="route('purchase.index')" :active="request()->routeIs('purchase.index')" class="text-white">
-              {{ __('Mis compras') }}
-            </x-nav-link>
           @endif
         @endauth
       </div>
